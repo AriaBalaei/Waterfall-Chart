@@ -58,7 +58,7 @@ function drawChart(data){
 
 
   const bargraph = mainCanvas.selectAll('g')
-  .data(data)
+  .data(nodes)
   .enter()
   .append('g')
 
@@ -73,10 +73,10 @@ function drawChart(data){
   const rectOfBars = bargraph
               .append('rect')
               .attr('width', 20)
-              .attr('height', d => Math.abs(d.expenses/50))
+              .attr('height', d => d.h)
               .attr('x', (d, i) => i*50)
-              .attr('y', (d) =>  yPlace(d.expenses)/50)
-              .attr('fill', d => colorSelector(d.expenses))
+              .attr('y', (d) =>  d.y)
+              .attr('fill', d => colorSelector(d.value))
 }
 
 function getWaterfallLayout(data) {
@@ -87,24 +87,43 @@ function getWaterfallLayout(data) {
   var [colName, colValue] = columns
 
   // Create waterfall layout
-  var lastEndPoint = 0
+  var h1 = 0
+  var y1 = 0
+  var v1 = 0
   data.forEach((e, i) => {
     // Callculate each node properties
     var name = e[colName]
-    var value = parseFloat(e[colValue])
-    var start = lastEndPoint
-    var end = lastEndPoint + value
-    lastEndPoint = end
+    var v2 = parseFloat(e[colValue])
+    var h2 = Math.abs(v2)
+    var y2 = i == 0 ? 0 : getY2(v1,v2,y1,h1,h2)
     // Declare and push node object
     var node = {
       name,
-      value,
-      start,
-      end
+      v1,
+      value: v2,
+      h: h2,
+      y: y2
     }
     nodes.push(node)
+    y1 = y2
+    h1 = h2
+    v1 = v2
   }
   )
-  
+  console.log(nodes)
   return nodes
+}
+
+function getY2(v1,v2,y1,h1,h2){
+  var y2 = 0
+  if(v1 >= 0 && v2 < 0)
+    y2 = y1
+  if(v1 >= 0 && v2 >= 0)
+    y2 = y1 - h2
+  if(v1 < 0 && v2 >= 0)
+    y2 = y1 + h1 - h2
+  if(v1 < 0 && v2 < 0)
+    y2 = y1 + h1
+
+  return y2
 }
