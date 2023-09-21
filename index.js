@@ -41,7 +41,7 @@ function getCSVData() {
 getCSVData();
 
 function drawChart(data){
-
+  var nodes = getWaterfallLayout(data)
   var array_num = [...data.map(d => parseFloat(d.expenses))]
   var max = d3.max(array_num)
 
@@ -77,4 +77,34 @@ function drawChart(data){
               .attr('x', (d, i) => i*50)
               .attr('y', (d) =>  yPlace(d.expenses)/50)
               .attr('fill', d => colorSelector(d.expenses))
+}
+
+function getWaterfallLayout(data) {
+  
+  // Create empty nodes and alias variable names for columns
+  var nodes = []
+  var columns = data.columns
+  var [colName, colValue] = columns
+
+  // Create waterfall layout
+  var lastEndPoint = 0
+  data.forEach((e, i) => {
+    // Callculate each node properties
+    var name = e[colName]
+    var value = parseFloat(e[colValue])
+    var start = lastEndPoint
+    var end = lastEndPoint + value
+    lastEndPoint = end
+    // Declare and push node object
+    var node = {
+      name,
+      value,
+      start,
+      end
+    }
+    nodes.push(node)
+  }
+  )
+  
+  return nodes
 }
