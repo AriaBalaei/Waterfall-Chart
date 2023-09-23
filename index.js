@@ -5,10 +5,10 @@ const svg = canvas.append('svg')
 //Margin
 const margin =
   {
-    top: 0,
+    top: 60,
     right: 60,
     bottom: 200,
-    left: 60,
+    left: 80,
     padding: 0.3
   };
 
@@ -62,20 +62,43 @@ function drawChart(data){
   .enter()
   .append('g')
 
+  const xAxisGroup = mainCanvas.append('g')
+                    .attr('transform', `translate(0, ${graphHeight})`)         
+  const yAxisGroup = mainCanvas.append('g')
+
+
   //scaleLinear
   const y = d3.scaleLinear()
-               .domain([0 ,60])
-               .range([0, graphHeight])
-
+              .domain([0 , max])
+              .range([0 ,graphHeight ])
+  const z = d3.scaleLinear()
+              .domain([max , 0])
+              .range([0 ,graphHeight ])
+  //scaleBand 
+  const x = d3.scaleBand()
+              .domain(nodes.map(item => item.value))
+              .range([0, 600])
+              .round(true)
+              .paddingInner(0.22)
+              .paddingOuter(0.25)
+              
+  
   var tickname = data.map(d => d.type)
- 
+
+  const yAxis = d3.axisLeft(z)
+                  .ticks(10, "$.2f") 
+  const xAxis = d3.axisBottom(x)
+                .tickFormat((d,i) => tickname[i])
+  
+  xAxisGroup.call(xAxis);
+  yAxisGroup.call(yAxis);   
   
   const rectOfBars = bargraph
               .append('rect')
-              .attr('width', 20)
-              .attr('height', d => d.h)
-              .attr('x', (d, i) => i*50)
-              .attr('y', (d) =>  d.y)
+              .attr('width',  x.bandwidth)
+              .attr('height', d => y(d.h))
+              .attr('x', (d, i) => x(d.value))
+              .attr('y', (d) =>  y(d.y))
               .attr('fill', d => colorSelector(d.value))
 }
 
@@ -110,7 +133,6 @@ function getWaterfallLayout(data) {
     v1 = v2
   }
   )
-  console.log(nodes)
   return nodes
 }
 
