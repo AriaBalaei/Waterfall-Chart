@@ -26,11 +26,10 @@ const mainCanvas = svg.append('g')
 function colorSelector(amount){
   if(amount >= 0)
     return 'green'
-  return 'red'
+  if(amount < 0)
+    return 'red'
+  return 'blue'
 }
-
-
-
 
 //CSV Data                
 function getCSVData() {
@@ -44,19 +43,19 @@ function drawChart(data){
   var nodes = getWaterfallLayout(data)
   var array_num = [...data.map(d => parseFloat(d.expenses))]
   var max = d3.max(array_num)
-
-  var firstBar = max
-  var positive = 0
-  var negetive = 0
-  
-  function yPlace(d) {
-      if(d < 0)
-        return negetive += d
-      return negetive
+  var totalAmount = 0
+  for(key of array_num){
+    totalAmount += key}
     
-  }
-
-
+    var total = {
+      name: 'Total',
+      value: 'Total',
+      h: totalAmount,
+      v1: totalAmount,
+      y: nodes[nodes.length-1].y
+    }
+    console.log(total)
+    nodes.push(total)
   const bargraph = mainCanvas.selectAll('g')
   .data(nodes)
   .enter()
@@ -84,6 +83,7 @@ function drawChart(data){
               
   
   var tickname = data.map(d => d.type)
+  tickname.push('Total')
 
   const yAxis = d3.axisLeft(z)
                   .ticks(10, "$.2f") 
@@ -133,6 +133,7 @@ function getWaterfallLayout(data) {
     v1 = v2
   }
   )
+  console.log(nodes)
   return nodes
 }
 
