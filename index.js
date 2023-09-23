@@ -77,10 +77,10 @@ function drawChart(data){
   //scaleBand 
   const x = d3.scaleBand()
               .domain(nodes.map(item => item.value))
-              .range([0, 600])
+              .range([0, 800])
               .round(true)
-              .paddingInner(0.22)
-              .paddingOuter(0.25)
+              .paddingInner(0.42)
+              .paddingOuter(0.5)
               
   
   var tickname = data.map(d => d.type)
